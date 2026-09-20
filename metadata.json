@@ -1,0 +1,8 @@
+{
+  "name": "AgriIrrig",
+  "description": "Calculateur d'irrigation de précision pour les agriculteurs et techniciens agricoles au Maroc - calcul des besoins en eau (ETc, volumes et durées d'arrosage).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

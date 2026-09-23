@@ -1,6 +1,6 @@
 /**
  * Types et modèles de données pour AgriIrrig
- * Conforme aux normes agronomiques marocaines (INRA Maroc, FAO-56, PNEI)
+ * Calculateur de pilotage de l'irrigation agricole de précision
  */
 
 export type GrowthStage = 'initial' | 'developpement' | 'mi_saison' | 'fin_saison';
@@ -28,7 +28,6 @@ export interface MoroccanRegion {
   name: string;
   ormvaOrDpa: string; // ex: ORMVA Souss-Massa, ORMVA Gharb, DPA Saïss
   climateZone: string;
-  // ET0 moyenne mensuelle (mm/jour) certifiée d'après les annales agro-climatiques DMN / INRA Maroc
   monthlyEt0: Record<number, number>; // 1 = Janvier, ..., 12 = Décembre
   typicalRainfallAnnualMm: number;
   principalCrops: string[];
@@ -55,7 +54,7 @@ export interface IrrigationSystem {
   maxEfficiency: number;
   flowUnitAdvised: 'm3_h' | 'l_s';
   description: string;
-  pneiStatus: string; // Statut PNEI / Subventions FDA Maroc
+  pneiStatus: string;
 }
 
 export interface CalculationInput {
@@ -116,3 +115,22 @@ export interface CalculationResult {
   warnings: string[];
   recommendations: string[];
 }
+
+export interface Parcel {
+  id: string;
+  name: string;
+  location: string;
+  regionId: string;
+  areaHa: number;
+  cropId: string;
+  growthStage: GrowthStage;
+  soilId: SoilTypeKey;
+  irrigationSystemId: IrrigationSystemType;
+  flowRate: number;
+  flowUnit: 'm3_h' | 'l_s';
+  latestIrrigationDate: string;
+  waterRequirementM3Day: number;
+  notes?: string;
+}
+
+export type ActiveTab = 'dashboard' | 'calculator' | 'parcels' | 'history' | 'crops' | 'settings';

@@ -10,13 +10,14 @@ import {
 } from '../data/moroccoData';
 
 /**
- * Générateur de rapport PDF professionnel pour AgriIrrig Maroc
- * Format A4 portrait, mise en page vectorielle haute fidélité
+ * Générateur de rapport PDF professionnel pour AgriIrrig
+ * Format A4 portrait, mise en page vectorielle
  */
 export async function exportCalculationToPdf(
   result: CalculationResult,
   chartsElementId?: string
 ): Promise<void> {
+
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -45,7 +46,7 @@ export async function exportCalculationToPdf(
 
   let y = margin;
 
-  // 1. EN-TÊTE SUPÉRIEUR & BANDEAU NATIONAL (Vert Émeraude Foncé)
+  // 1. EN-TÊTE SUPÉRIEUR (Vert Émeraude Foncé)
   doc.setFillColor(15, 60, 40); // #0f3c28
   doc.roundedRect(margin, y, contentWidth, 24, 3, 3, 'F');
 
@@ -53,14 +54,14 @@ export async function exportCalculationToPdf(
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('AGRI-IRRIG MAROC', margin + 6, y + 8);
+  doc.text('AGRI-IRRIG', margin + 6, y + 8);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(190, 242, 210);
   doc.text("Bulletin Technique de Prescription & Bilan d'Irrigation de Précision", margin + 6, y + 14);
   doc.setFontSize(7.5);
-  doc.text("Plan National de l'Eau • Stratégie Génération Green 2020-2030 • Référentiel INRA/FAO-56", margin + 6, y + 19);
+  doc.text("Calcul des volumes d'arrosage et des temps d'ouverture des vannes", margin + 6, y + 19);
 
   // Badge Date & Réf à droite
   const dateFormatted = new Date().toLocaleDateString('fr-FR', {
@@ -247,7 +248,7 @@ export async function exportCalculationToPdf(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(15, 23, 42);
-  doc.text('2. Décomposition des Calculs Hydro-Climatiques (Méthode FAO-56 & INRA)', margin + 4, y + 6);
+  doc.text('2. Décomposition des Calculs Hydro-Climatiques', margin + 4, y + 6);
 
   doc.setDrawColor(203, 213, 225);
   doc.line(margin + 4, y + 8, margin + contentWidth - 4, y + 8);
@@ -274,8 +275,8 @@ export async function exportCalculationToPdf(
     {
       param: 'Évapotranspiration Référence (ET0)',
       val: `${result.et0} mm/jour`,
-      ref: 'Météo / Annales INRA',
-      impact: `Demande évaporative régionale (${monthLabel})`
+      ref: 'Données climatiques régionales',
+      impact: `Demande évaporative (${monthLabel})`
     },
     {
       param: 'Coefficient cultural (Kc)',
@@ -292,7 +293,7 @@ export async function exportCalculationToPdf(
     {
       param: 'Précipitation & Pluie efficace (Peff)',
       val: `${result.effectiveRainfall} mm/jour`,
-      ref: 'Méthode FAO / USDA',
+      ref: 'Calcul des pluies utiles',
       impact: result.effectiveRainfall > 0 
         ? `Économie : ${(result.effectiveRainfall * result.surfaceHa * 10).toFixed(0)} m³ sur la parcelle` 
         : 'Aucun apport pluvial comptabilisé'
@@ -402,7 +403,7 @@ export async function exportCalculationToPdf(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(15, 23, 42);
-  doc.text('4. Diagnostic Agronomique & Conseils d\'Exploitation (INRA / PNEI)', margin + 4, y + 6);
+  doc.text('4. Diagnostic Agronomique & Conseils d\'Exploitation', margin + 4, y + 6);
 
   doc.setDrawColor(203, 213, 225);
   doc.line(margin + 4, y + 8, margin + contentWidth - 4, y + 8);
@@ -446,31 +447,36 @@ export async function exportCalculationToPdf(
 
   y += 58;
 
-  // 7. PIED DE PAGE TECHNIQUE & SIGNATURE
-  doc.setFont('helvetica', 'italic');
+  // 7. PIED DE PAGE TECHNIQUE & VISA D'EXPLOITATION
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(100, 116, 139);
   doc.text(
-    "Ce bulletin constitue une aide à la décision établie selon les normes FAO-56 & INRA Maroc. Il est recommandé de corréler avec des sondes capacitives ou tensiométriques.",
+    `AgriIrrig • Bulletin technique de pilotage d'irrigation et de gestion des vannes d'arrosage.`,
     margin,
     pageHeight - 14
   );
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
+  doc.setFontSize(6.5);
   doc.text(
-    `Document édité par AgriIrrig Maroc • Programme National d'Économie d'Eau en Irrigation (PNEI) • Page 1/1`,
+    `Document d'exploitation parcellaire • Page 1/1`,
     margin,
     pageHeight - 10
   );
 
-  // Cadre de visa exploitant / conseiller agricole
+  // Cadre de visa exploitant / responsable d'arrosage
+  doc.setFillColor(248, 250, 252);
   doc.setDrawColor(203, 213, 225);
-  doc.rect(pageWidth - margin - 45, pageHeight - 20, 45, 12);
+  doc.roundedRect(pageWidth - margin - 55, pageHeight - 22, 55, 14, 1.5, 1.5, 'FD');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
+  doc.setTextColor(23, 63, 53); // #173F35
+  doc.text(`Visa Responsable Exploitation :`, pageWidth - margin - 52, pageHeight - 17);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
-  doc.text('Visa Technicien / Exploitant :', pageWidth - margin - 43, pageHeight - 16);
+  doc.text(`Date & Signature :`, pageWidth - margin - 52, pageHeight - 11);
 
   // Capture optionnelle des graphiques si un ID est passé
   if (chartsElementId) {
@@ -494,7 +500,7 @@ export async function exportCalculationToPdf(
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
-        doc.text('AGRI-IRRIG MAROC — Graphiques & Visualisations de la Parcelle', margin + 6, margin + 7);
+        doc.text('AGRI-IRRIG — Graphiques & Visualisations de la Parcelle', margin + 6, margin + 7);
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
         doc.setTextColor(190, 242, 210);
@@ -510,7 +516,7 @@ export async function exportCalculationToPdf(
         doc.setFontSize(7);
         doc.setTextColor(100, 116, 139);
         doc.text(
-          `Annexe Graphique • AgriIrrig Maroc • Page 2/2`,
+          `Annexe Graphique • AgriIrrig • Page 2/2`,
           margin,
           pageHeight - 10
         );
